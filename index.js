@@ -22,6 +22,34 @@ app.get('/students', async (req, res) => {
   }
 });
 
+app.post('/students', async (req, res) => {
+  const {
+    student_id,
+    first_name,
+    last_name,
+    gender,
+    dob,
+    email,
+    phone,
+    address
+  } = req.body;
+
+  try {
+    const result = await db.query(
+      `INSERT INTO students 
+       (student_id, first_name, last_name, gender, dob, email, phone, address) 
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8) 
+       RETURNING *`,
+      [student_id, first_name, last_name, gender, dob, email, phone, address]
+    );
+
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
